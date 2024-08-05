@@ -1,0 +1,6 @@
+version: "3"
+
+includes:
+  setup:
+    taskfile: ./installation-kind/Taskfile.yaml
+    dir: ./installation-kind
