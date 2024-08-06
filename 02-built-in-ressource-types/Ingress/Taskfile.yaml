@@ -1,0 +1,45 @@
+version: "3"
+
+env:
+  CLUSTER_NAME: KUBE
+  # Set default gum style options
+  BORDER: double
+  BORDER_FOREGROUND: "212"
+  PADDING: "1 1"
+  MARGIN: "1 1"
+
+tasks:
+  01-create-namespace:
+    desc: "Create a namespace for these examples and set as default"
+    cmds:
+      - kubectl apply -f Namespace.yaml
+      - kubens ${NAMESPACE}
+
+  02-apply-ingress-NGINX:
+    desc: "Apply NGINX Ingress Controller Resources"
+    cmds:
+      - kubectl apply -f kind-nginx-ingress-controller.yaml
+
+  03-Wait-NGINX-Ingress-Controller-ready:
+    desc: "Wait for the NGINX Ingress Controller to be ready"
+    cmds:
+      - kubectl wait --namespace ingress-nginx --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=90s
+
+  04-Apply-resources:
+    desc: "Apply these resources"
+    cmds:
+      - kubectl apply -f nginx-deployment.yaml 
+
+  05-Apply-resources:
+    desc: "Apply these resources"
+    cmds:
+      - kubectl apply -f web-deployments.yaml    
+
+  06-delete-namespace:
+    desc: "Delete the namespace to clean up"
+    cmds:
+      - cmd: gum style "🚨 Deleting the namespace recursively deletes the resources inside of it! 🚨 "
+        silent: true
+      - kubectl delete -f Namespace.yaml     
+          
+ 
