@@ -30,8 +30,8 @@ tasks:
     cmds:
       - kubectl apply -f nginx-deployment.yaml 
 
-  05-Apply-resources:
-    desc: "Apply these resources"
+  05-Apply-resources2:
+    desc: "Apply these resources2"
     cmds:
       - kubectl apply -f web-deployments.yaml    
 

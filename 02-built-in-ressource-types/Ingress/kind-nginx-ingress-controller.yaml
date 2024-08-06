@@ -1,5 +1,5 @@
 # Copied from 
-# https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.5.1/deploy/static/provider/kind/deploy.yaml
+# https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.30.0/deploy/static/provider/kind/deploy.yaml
 # as a backup in case the user has Github access issues while working on our examples
 
 apiVersion: v1
@@ -447,7 +447,7 @@ spec:
         - --validating-webhook-certificate=/usr/local/certificates/cert
         - --validating-webhook-key=/usr/local/certificates/key
         - --watch-ingress-without-class=true
-        - --publish-status-address=0.0.0.0
+        - --publish-status-address=127.17.0.15
         env:
         - name: POD_NAME
           valueFrom:
