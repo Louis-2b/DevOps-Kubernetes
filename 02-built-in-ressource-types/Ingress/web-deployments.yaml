@@ -1,56 +1,50 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: simple-webapp-color-red
+  name: foo-app
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: web-red
+      app: foo
   template:
     metadata:
       labels:
-        app: web-red
+        app: foo
     spec:
       containers:
-      - name: web1
-        image: mmumshad/simple-webapp-color  # Image pour le premier déploiement
+      - name: foo-app
+        image: registry.k8s.io/e2e-test-images/agnhost:2.39  # Image pour le premier déploiement
         ports:
         - containerPort: 80
-        env:
-        - name: APP_COLOR
-          value: red
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: simple-webapp-color-blue
+  name: bar-app
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: web-blue
+      app: bar
   template:
     metadata:
       labels:
-        app: web-blue
+        app: bar
     spec:
       containers:
-      - name: web2
-        image: mmumshad/simple-webapp-color  # Image pour le deuxième déploiement
+      - name: bar-app
+        image: registry.k8s.io/e2e-test-images/agnhost:2.39  # Image pour le deuxième déploiement
         ports:
         - containerPort: 80
-        env:
-        - name: APP_COLOR
-          value: blue
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: web-red-service1
+  name: foo-service
 spec:
   selector:
-    app: web-red
+    app: foo
   ports:
   - protocol: TCP
     port: 80
@@ -59,10 +53,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: web-blue-service2
+  name: bar-service
 spec:
   selector:
-    app: web-blue
+    app: bar
   ports:
   - protocol: TCP
     port: 80
@@ -73,27 +67,23 @@ kind: Ingress
 metadata:
   name: nginx-ingress
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   rules:
-  - host: web1.example.com
-    http:
+  - http:
       paths:
-      - path: /
-        pathType: Prefix
+      - pathType: Prefix
+        path: /foo(/|$)(.*)
         backend:
           service:
-            name: web-red-service1
+            name: foo-service
             port:
               number: 80
-  - host: web2.example.com
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
+      - pathType: Prefix
+        path: /bar(/|$)(.*)
         backend:
           service:
-            name: web-blue-service2
+            name: bar-service
             port:
               number: 80
 
