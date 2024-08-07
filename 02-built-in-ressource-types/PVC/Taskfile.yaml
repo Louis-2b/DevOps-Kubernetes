@@ -1,0 +1,46 @@
+version: "3"
+
+env:
+  CLUSTER_NAME: KUBE
+  # Set default gum style options
+  BORDER: double
+  BORDER_FOREGROUND: "212"
+  PADDING: "1 1"
+  MARGIN: "1 1"
+  NAMESPACE: 04--pvc
+
+tasks:
+  01-Create-namespace:
+    desc: "Create a namespace for these examples and set as default"
+    cmds:
+      - kubectl apply -f Namespace.yaml
+      - kubens ${NAMESPACE}
+
+  02-Create-pod-mysql-volume:
+    desc: "Create a pod with volume local"
+    cmds:
+      - kubectl apply -n ${NAMESPACE} -f mysql-volume.yaml
+
+  03-Create-PV:
+    desc: "Create a PV"
+    cmds:
+      - kubectl apply -n ${NAMESPACE} -f pv.yaml
+
+  04-Create-PVC:
+    desc: "Create a PVC"
+    cmds:
+      - kubectl apply -n ${NAMESPACE} -f pvc.yaml 
+
+  05-Create-pod-mysql-pvc:
+    desc: "Create a pod using pv"
+    cmds:
+      - kubectl apply -n ${NAMESPACE} -f mysql-pv.yaml
+
+  06-delete-namespace:
+    desc: "Delete the namespace to clean up"
+    cmds:
+      - cmd: gum style "🚨 Deleting the namespace recursively deletes the resources inside of it! 🚨 "
+        silent: true
+      - kubectl delete -f Namespace.yaml     
+          
+ 

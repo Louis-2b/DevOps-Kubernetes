@@ -17,17 +17,17 @@ tasks:
   02-create-pod-red:
     desc: "Apply the Pod configuration"
     cmds:
-      - kubectl apply -f pod-red.yaml
+      - kubectl apply -n ${NAMESPACE} -f pod-red.yaml
 
   03-create-pod-blue:
     desc: "Apply the Pod configuration"
     cmds:
-      - kubectl apply -f pod-blue.yaml    
+      - kubectl apply -n ${NAMESPACE} -f pod-blue.yaml    
 
   04-create-service-nodeport:
     desc: "Apply the  NodePort Service"
     cmds:
-      - kubectl apply -f service-nodeport-web.yaml
+      - kubectl apply -n ${NAMESPACE} -f service-nodeport-web.yaml
 
   05-expose-port:
     desc: "Port forward minimal"

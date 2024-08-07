@@ -17,7 +17,7 @@ tasks:
   02-create-deployment:
     desc: "Apply the minimal Deployment configuration"
     cmds:
-      - kubectl apply -f Deployment.nginx-minimal.yaml
+      - kubectl apply -n ${NAMESPACE} -f Deployment.nginx-minimal.yaml
 
   03-delete-namespace:
     desc: "Delete the namespace to clean up"
