@@ -1,0 +1,102 @@
+version: "3"
+
+env:
+  BORDER: double
+  BORDER_FOREGROUND: "212"
+  PADDING: "1 1"
+  MARGIN: "1 1"
+  POSTGRES_VERSION_1: 15.4.1
+  POSTGRES_VERSION_2: 15.4.2
+  NAMESPACE: 05--postgresql
+
+tasks:
+  01-Create-namespace:
+    desc: "Create a namespace for these examples and set as default"
+    cmds:
+      - kubectl apply -f Namespace.yaml
+      - kubens ${NAMESPACE}
+  
+  
+  01-search-repo:
+    desc: Search Bitnami repository for PostgreSQL
+    cmds:
+      - helm search repo bitnami/postgresql --versions 
+
+  ### OCI registry
+  02-login-oci-registry:
+    desc: Login to OCI registry 
+    cmds:
+      - cmd: gum style "Use your dockerhub username and password!"
+        silent: true
+      - helm registry login registry-1.docker.io 
+
+  03-list-registry:
+    desc: List tags in the OCI registry
+    cmds:
+      - oras repo tags registry-1.docker.io/bitnamicharts/postgresql 
+
+  04-pull:
+    desc: Pull PostgreSQL chart from Bitnami repository
+    cmds:
+      - helm pull bitnami/postgresql --version=${POSTGRES_VERSION_2} 
+
+  05-untar:
+    desc: Untar PostgreSQL chart
+    cmds:
+      - tar -xzf postgresql-${POSTGRES_VERSION_2}.tgz
+
+  06-show-values:
+    desc: Show values for PostgreSQL chart
+    cmds:
+      - helm show values bitnami/postgresql --version=${POSTGRES_VERSION_2}
+
+  07-install:
+    desc: Install PostgreSQL chart
+    cmds:
+      - |
+        helm install postgresql bitnami/postgresql \
+          --version=${POSTGRES_VERSION_1} \
+          --create-namespace \
+          --values=values.yaml 
+
+  08-upgrade:
+    desc: Upgrade PostgreSQL chart
+    cmds:
+      - |
+        helm upgrade --install postgresql bitnami/postgresql \
+          --version=${POSTGRES_VERSION_2} \
+          --create-namespace \
+          --values=values.yaml
+
+  09-rollback:
+    desc: Rollback PostgreSQL chart  
+    cmds:
+      - helm rollback postgresql   
+
+  10-list:
+    desc: List Helm releases 
+    cmds:
+      - helm list -n ${NAMESPACE}  
+
+  11-get-values:
+    desc: Get values for PostgreSQL release
+    cmds:
+      - helm get values postgresql 
+
+  12-get-manifests:
+    desc: Get manifests for PostgreSQL release 
+    cmds:
+      - helm get manifest postgresql
+
+  13-uninstall:
+    desc: Uninstall PostgreSQL release
+    cmds:
+      - helm uninstall postgresql
+
+  14-delete-namespace:
+    desc: "Delete the namespace to clean up"
+    cmds:
+      - cmd: gum style "🚨 Deleting the namespace recursively deletes the resources inside of it! 🚨 "
+        silent: true
+      - kubectl delete -f Namespace.yaml    
+                
