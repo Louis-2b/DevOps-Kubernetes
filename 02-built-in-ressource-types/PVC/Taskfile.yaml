@@ -32,7 +32,7 @@ tasks:
       - kubectl apply -n ${NAMESPACE} -f pvc.yaml 
 
   05-Create-pod-mysql-pvc:
-    desc: "Create a pod using pv"
+    desc: "Create a pod using pvc"
     cmds:
       - kubectl apply -n ${NAMESPACE} -f mysql-pv.yaml
 
