@@ -14,10 +14,17 @@ tasks:
       - kubectl apply -f Namespace.yaml
       - kubens ${NAMESPACE}
 
+  01-Create-pod-def:
+    desc: "Apply the pod-definition configuration"
+    cmds:
+      - kubectl apply -n ${NAMESPACE} -f pod-definition.yaml
+      - kubectl get pods
+        
   02-create-pod:
     desc: "Apply the minimal pod configuration"
     cmds:
       - kubectl apply -n ${NAMESPACE} -f pod.minimal-apply.yaml
+      - kubectl get pods
 
   03-expose-port:
     desc: "Port forward minimal"
