@@ -1,0 +1,9 @@
+telegraf:
+  tag: 1.13-alpine
+chronograf:
+  tag: 1.7-alpine
+kapacitor:
+  tag: 1.5-alpine
+influxdb:
+  tag: 1.5-alpine
+

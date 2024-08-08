@@ -26,10 +26,5 @@ tasks:
   04-Check-version:
     desc: "Let's check the version"
     cmds:
-      - helm version  
-  
-  ### Helm repo
-  05-Add-repo:
-    desc: Add Bitnami Helm repository 
-    cmds:
-      - helm repo add bitnami https://charts.bitnami.com/bitnami
+      - helm version   
+ 

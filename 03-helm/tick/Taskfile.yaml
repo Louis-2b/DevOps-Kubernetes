@@ -1,0 +1,101 @@
+version: "3"
+
+env:
+  BORDER: double
+  BORDER_FOREGROUND: "212"
+  PADDING: "1 1"
+  MARGIN: "1 1"
+  NAMESPACE: ingress-nginx
+
+tasks:
+  01-Create-namespace:
+    desc: "Create a namespace for these examples and set as default"
+    cmds:
+      - kubectl apply -f Namespace.yaml
+      - kubens ${NAMESPACE} 
+
+  02-download-archive:  
+    desc: "Get the manifests.tar archive"
+    cmds:
+      - wget -O manifests.tar https://gitlab.com/lucj/k8s-exercices/-/raw/master/Helm/tick/manifests.tar  
+
+  03-untar:
+    desc: "Untar l'archive manifests.tar"
+    cmds:
+      - tar xvf manifests.tar  
+
+  ### Helm repo
+  04-add-repo:
+    desc: "Add ingress-nginx repo and install ingress-nginx"
+    cmds:
+      - helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+      - helm repo update     
+
+  05-search-repo:
+    desc: "Search Bitnami repository for Ingress-Nginx"
+    cmds:
+      - helm search repo ingress-nginx 
+
+  06-Check-Existing-Installation:
+    desc: "Check Existing Installation"
+    cmds: 
+      - kubectl get ingressclass  
+
+  07-install-ingress-nginx:
+    desc: "Install ingress-nginx from Helm repository"
+    cmds:
+      - kubectl delete ingressclass nginx || true
+      - helm install my-ingress ingress-nginx/ingress-nginx
+
+  08-Monitor-Installation:
+    desc: "monitor the current installation to ensure it is working properly"
+    cmds:
+      - kubectl get pods -n ingress-nginx   
+
+  09-Create-manifests:
+    desc: "Place yourself in the tick directory and create the different resources present in the manifests directory"
+    cmds:
+      - kubectl apply -f manifests    
+
+  10-Verification:
+    desc: "Then verify that the creation was successful by running the following command"
+    cmds:
+      - kubectl get deploy,po,svc,ingress  
+
+  11-Cleanup:
+    desc: "Delete the app"
+    cmds:
+      - kubectl delete -f manifests 
+
+  12-Create-chart-helm: 
+    desc: "Still from the tick directory, use the following command to create a Chart named tick_chart."
+    cmds:
+      -  helm create tick_chart  
+
+  13-Delete-and-copy-manifest-files:
+    desc: "Copying the manifest files"
+    cmds:
+      - rm tick_chart/templates/*.yaml
+      - rm -r tick_chart/templates/tests
+      - rm tick_chart/templates/NOTES.txt
+      - cp manifests/*.yaml tick_chart/templates
+      - echo > tick_chart/values.yaml
+
+  14-Directory-content:
+    desc: "The directory will then have the following contents"    
+    cmds:
+      - sudo apt install tree
+      - tree tick_chart/
+
+  15-Chart-Launch:
+    desc: "launch the application now packaged in a Helm chart"
+    cmds:
+      - helm install tick ./tick_chart 
+      - helm ls -A  
+
+  16-Delete-namespace:
+    desc: "Delete the namespace to clean up"
+    cmds:
+      - cmd: gum style "🚨 Deleting the namespace recursively deletes the resources inside of it! 🚨 "
+        silent: true
+      - kubectl delete -f Namespace.yaml        
