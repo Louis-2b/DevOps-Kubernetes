@@ -1,0 +1,107 @@
+version: "3"
+
+env:
+  BORDER: double
+  BORDER_FOREGROUND: "212"
+  PADDING: "1 1"
+  MARGIN: "1 1"
+  WORDPRESS_VERSION_1: 22.4.1
+  WORDPRESS_VERSION_2: 22.4.2
+  NAMESPACE: 05--wordpress
+
+tasks:
+  01-Create-namespace:
+    desc: "Create a namespace for these examples and set as default"
+    cmds:
+      - kubectl apply -f Namespace.yaml
+      - kubens ${NAMESPACE}
+
+  ### Helm repo
+  02-add-repo:
+    cmds:
+      - helm repo add bitnami https://charts.bitnami.com/bitnami
+    desc: Add Bitnami Helm repository    
+  
+  03-search-repo:
+    desc: Search Bitnami repository for Wordpress
+    cmds:
+      - helm search repo bitnami/wordpress --versions 
+
+  ### OCI registry
+  04-login-oci-registry:
+    desc: Login to OCI registry 
+    cmds:
+      - cmd: gum style "Use your dockerhub username and password!"
+        silent: true
+      - helm registry login registry-1.docker.io 
+
+  05-list-registry:
+    desc: List tags in the OCI registry
+    cmds:
+      - oras repo tags registry-1.docker.io/bitnamicharts/wordpress
+
+  06-pull:
+    desc: Pull Wordpress chart from Bitnami repository
+    cmds:
+      - helm pull bitnami/wordpress --version=${WORDPRESS_VERSION_2} 
+
+  07-untar:
+    desc: Untar Wordpress chart
+    cmds:
+      - tar -xzf wordpress-${WORDPRESS_VERSION_2}.tgz
+
+  08-show-values:
+    desc: Show values for Wordpress chart
+    cmds:
+      - helm show values bitnami/wordpress --version=${WORDPRESS_VERSION_2}
+
+  09-install:
+    desc: Install Wordpress chart
+    cmds:
+      - |
+        helm install wordpress bitnami/wordpress \
+          --version=${WORDPRESS_VERSION_1} \
+          --create-namespace \
+          --values=values.yaml 
+
+  10-upgrade:
+    desc: Upgrade Wordpress chart
+    cmds:
+      - |
+        helm upgrade --install wordpress bitnami/wordpress \
+          --version=${WORDPRESS_VERSION_2} \
+          --create-namespace \
+          --values=values.yaml
+
+  11-rollback:
+    desc: Rollback Wordpress chart  
+    cmds:
+      - helm rollback wordpress  
+
+  12-list:
+    desc: List Helm releases 
+    cmds:
+      - helm list -n ${NAMESPACE}  
+
+  13-get-values:
+    desc: Get values for Wordpress release
+    cmds:
+      - helm get values wordpress
+
+  14-get-manifests:
+    desc: Get manifests for Wordpress release 
+    cmds:
+      - helm get manifest wordpress
+
+  15-uninstall:
+    desc: Uninstall Wordpress release
+    cmds:
+      - helm uninstall wordpress
+
+  16-delete-namespace:
+    desc: "Delete the namespace to clean up"
+    cmds:
+      - cmd: gum style "🚨 Deleting the namespace recursively deletes the resources inside of it! 🚨 "
+        silent: true
+      - kubectl delete -f Namespace.yaml    
+                
