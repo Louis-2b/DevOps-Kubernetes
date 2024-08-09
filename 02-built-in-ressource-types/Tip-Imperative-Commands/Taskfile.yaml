@@ -1,0 +1,77 @@
+version: "3"
+
+env:
+  BORDER: double
+  BORDER_FOREGROUND: "212"
+  PADDING: "1 1"
+  MARGIN: "1 1"
+
+
+# --dry-run: Par défaut dès que la commande est exécutée, la ressource sera créée.
+# Si vous souhaitez simplement tester votre commande, utilisez l'option --dry-run=client . Cela ne créera pas la ressource, mais vous indiquera si la ressource peut être créée et si votre commande est correcte.
+# -o yaml: Cela affichera la définition de la ressource au format YAML à l'écran.
+
+tasks:
+# POD
+  01-Create-pod-NGINX:
+    desc: "Créer un pod NGINX"
+    cmds:
+      - kubectl run nginx --image=nginx
+
+  01-Generate-POD-Manifest-YAML-file:    
+    desc: "Générer le fichier YAML du manifeste POD (-o yaml). Ne pas le créer (–dry-run)"
+    cmds: 
+      - kubectl run nginx --image=nginx --dry-run=client -o yaml
+
+# Deployment
+  02-Create-a-Deployment:
+    desc: "Créer un déploiement"
+    cmds:
+      - kubectl create deployment --image=nginx nginx
+
+  02-Generate-Deployment-YAML-file:
+    desc: "Générer le fichier YAML de déploiement (-o yaml). Ne pas le créer (–dry-run)"
+    cmds:
+      - kubectl create deployment --image=nginx nginx --dry-run -o yaml`
+
+  03-Generate-Deployment-with-4-Replicas:
+    desc: "Générer un déploiement avec 4 répliques"
+    cmds: 
+      - kubectl create deployment nginx --image=nginx --replicas=4
+
+  04-Scale:
+    desc: "Vous pouvez également faire évoluer un déploiement à l’aide de la kubectl scale  commande."
+    cmds: 
+      - kubectl scale deployment nginx --replicas=5
+
+  05-Create-YAML-file-and-Modify:    
+    desc: "Une autre façon de procéder consiste à enregistrer la définition YAML dans un fichier et à la modifier."
+    cmds:
+      - kubectl create deployment nginx --image=nginx--dry-run=client -o yaml > nginx-deployment.yaml
+
+    desc: "Vous pouvez ensuite mettre à jour le fichier YAML avec les répliques ou tout autre champ avant de créer le déploiement."
+
+#Service
+  06-Create-Service-ClusterIP:
+    desc: "Créez un service nommé redis-service de type ClusterIP pour exposer le pod redis sur le port 6379"
+    cmds: 
+      - kubectl expose pod redis --port=6379 --name redis-service --dry-run=client -o yaml
+
+    desc: "(Cela utilisera automatiquement les étiquettes du pod comme sélecteurs)"
+
+#Ou
+
+    cmds:
+    - kubectl create service clusterip redis --tcp=6379:6379 --dry-run=client -o yaml
+    desc: "(Cela n'utilisera pas les étiquettes des pods comme sélecteurs, mais supposera que les sélecteurs sont app=redis. Vous ne pouvez pas transmettre de sélecteurs en tant qu'option. Cela ne fonctionne donc pas très bien si votre pod a un ensemble d'étiquettes différent. Générez donc le fichier et modifiez les sélecteurs avant de créer le service)"
+
+  07-Create-Service-NodePort:
+    desc: "Créez un service nommé nginx de type NodePort pour exposer le port 80 du pod nginx sur le port 30080 sur les nœuds"
+    cmds:
+      - kubectl expose pod nginx --port=80 --name nginx-service --type=NodePort --dry-run=client -o yaml
+    desc: "(Cela utilisera automatiquement les étiquettes du pod comme sélecteurs,  mais vous ne pouvez pas spécifier le port du nœud . Vous devez générer un fichier de définition, puis ajouter le port du nœud manuellement avant de créer le service avec le pod.)"
+
+#Ou
+
+    cmds: 
+      - kubectl create service nodeport nginx --tcp=80:80 --node-port=30080 --dry-run=client -o yaml

@@ -1,0 +1,41 @@
+version: "3"
+
+env:
+  BORDER: double
+  BORDER_FOREGROUND: "212"
+  PADDING: "1 1"
+  MARGIN: "1 1"
+  NAMESPACE: 04--format
+
+# Le format de sortie par défaut pour toutes  les commandes kubectl  est le format de texte brut lisible par l'homme.
+
+# L'indicateur -o nous permet de générer les détails dans plusieurs formats différents.
+
+# **kubectl [commande] [TYPE] [NOM] -o ** 
+
+# Voici quelques-uns des formats couramment utilisés :
+
+# 1 -o jsonGénérer un objet API au format JSON.
+
+# 2 -o nameImprimez uniquement le nom de la ressource et rien d'autre.
+
+# 3 -o wideSortie au format texte brut avec toutes les informations supplémentaires.
+
+# 4 -o yamlGénérer un objet API au format YAML
+
+
+tasks:
+  01-Output-JSON-format:
+    desc: "Sortie au format JSON"
+    cmds:
+      - kubectl create namespace ${NAMESPACE} --dry-run -o json
+
+  02-Output-YAML-format:
+    desc: "Sortie au format YAML"
+    cmds:
+      - kubectl create namespace ${NAMESPACE} --dry-run -o yaml
+
+  03-Output-wide:
+    desc: "Sortie avec wide (détails supplémentaires)"   
+    cmds:
+      - kubectl get pods -o wide  

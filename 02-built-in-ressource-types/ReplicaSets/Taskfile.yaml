@@ -5,7 +5,8 @@ env:
   BORDER_FOREGROUND: "212"
   PADDING: "1 1"
   MARGIN: "1 1"
-  NAMESPACE: 04--deployment
+  NAMESPACE: 04--replicasets
+  NAME_REPLICAS: myapp-replicaset
 
 tasks:
   01-create-namespace:
@@ -13,21 +14,19 @@ tasks:
     cmds:
       - kubectl apply -f Namespace.yaml
       - kubens ${NAMESPACE}
-
-  02-create-deployment:
-    desc: "Apply the minimal Deployment configuration"
+        
+  02-create-replicaset:
+    desc: "Apply the replicasetconfiguration"
     cmds:
-      - kubectl apply -n ${NAMESPACE} -f Deployment.nginx-minimal.yaml
-      - kubectl get deployments
-      - kubectl get replicaset 
+      - kubectl apply -n ${NAMESPACE} -f replicaset-definition.yaml
+      - kubectl get replicaset
       - kubectl get pods
 
-  03-create-deployment:
-    desc: "Apply the minimal Deployment configuration"
+  03-Scale:
+    desc: "Scale ReplicaSet"
     cmds:
-      - kubectl apply -n ${NAMESPACE} -f deployment-definition.yaml   
-      - kubectl get deployments
-      - kubectl get replicaset 
+      - kubectl scale replicaset ${NAME_REPLICAS} --replicas=2
+      - kubectl get replicaset
       - kubectl get pods
 
   04-delete-namespace:
